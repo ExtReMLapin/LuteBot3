@@ -125,7 +125,8 @@ namespace LuteBot.LiveInput.Midi
                 inputDevice.StartRecording();
             }
             recording = true;
-            RecordingStateChanged.Invoke(this, new EventArgs());
+            if (RecordingStateChanged != null)
+                RecordingStateChanged.Invoke(this, new EventArgs());
         }
 
         public void Off()
@@ -135,7 +136,8 @@ namespace LuteBot.LiveInput.Midi
                 inputDevice.StopRecording();
             }
             recording = false;
-            RecordingStateChanged.Invoke(this, new EventArgs());
+            if (RecordingStateChanged != null)
+                RecordingStateChanged.Invoke(this, new EventArgs());
         }
     }
 }

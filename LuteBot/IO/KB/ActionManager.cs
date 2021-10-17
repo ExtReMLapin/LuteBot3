@@ -87,12 +87,56 @@ namespace LuteBot.IO.KB
 
 
         private static Keys[] importantModifierKeys = new Keys[] { Keys.Alt, Keys.Control, Keys.ControlKey, Keys.LControlKey, Keys.RControlKey, Keys.Shift, Keys.ShiftKey, Keys.LShiftKey, Keys.RShiftKey };
+        #region imports
+        [StructLayout(LayoutKind.Sequential)]
+        struct POINT
+        {
+            public Int32 x;
+            public Int32 y;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct CURSORINFO
+        {
+            public Int32 cbSize;        // Specifies the size, in bytes, of the structure. 
+                                        // The caller must set this to Marshal.SizeOf(typeof(CURSORINFO)).
+            public Int32 flags;         // Specifies the cursor state. This parameter can be one of the following values:
+                                        //    0             The cursor is hidden.
+                                        //    CURSOR_SHOWING    The cursor is showing.
+            public IntPtr hCursor;          // Handle to the cursor. 
+            public POINT ptScreenPos;       // A POINT structure that receives the screen coordinates of the cursor. 
+        }
+
+        /// <summary>Must initialize cbSize</summary>
+        [DllImport("user32.dll")]
+        static extern bool GetCursorInfo(ref CURSORINFO pci);
+
+        private const Int32 CURSOR_SHOWING = 0x00000001;
+
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+        #endregion
 
         private static void InputCommand(int noteId, int channel) // Channel is just for identification to invoke a NotePlayed event
         {
             Process[] processes = Process.GetProcessesByName("Mordhau-Win64-Shipping");
             var modKeys = Control.ModifierKeys;
+             if (processes.Length != 1) // if there is no game detected then fuck off
+                return;
+            IntPtr winhandle = processes[0].MainWindowHandle;
+            if (winhandle != GetForegroundWindow()) // if the game has no focus, then fuck off
+                return;
 
+            CURSORINFO pci = new CURSORINFO();
+            pci.cbSize = Marshal.SizeOf(typeof(CURSORINFO));
+            GetCursorInfo(ref pci); // it stores the cursordata to the struct
+
+
+
+            
+            if (pci.flags == CURSOR_SHOWING)
+                return;
             foreach (var modKey in importantModifierKeys)
                 if ((modKeys & modKey) == modKey)
                 {
