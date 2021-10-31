@@ -237,7 +237,14 @@ namespace LuteBot.Core.Midi
             isPlaying = false;
             sequencer.Stop();
             sequencer.Position = 0;
-            outDevice.Reset();
+            try
+            {
+                outDevice.Reset();
+            }
+            catch(Exception e)
+			{
+
+			}
         }
 
         public override void Play()
