@@ -174,7 +174,11 @@ namespace LuteBot
             for (int i = 0; i < numDevices; i++)
                 outputDeviceBox.Items.Add(OutputDevice.GetDeviceCapabilities(i).name);
 
-            outputDeviceBox.SelectedIndex = ConfigManager.GetIntegerProperty(PropertyItem.OutputDevice);
+            try
+            {
+                outputDeviceBox.SelectedIndex = ConfigManager.GetIntegerProperty(PropertyItem.OutputDevice);
+            }
+            catch { } // Some people have no output devices and that's awkward
         }
 
         private void SetVersion()
@@ -327,6 +331,8 @@ namespace LuteBot
                 ConfigManager.SetProperty(PropertyItem.NoteCooldown, target.NoteCooldown.ToString());
 
                 ConfigManager.SetProperty(PropertyItem.LowestPlayedNote, target.LowestPlayedNote.ToString());
+
+                ConfigManager.SetProperty(PropertyItem.ForbidsChords, target.ForbidsChords.ToString());
             }
         }
 
